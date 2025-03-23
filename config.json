@@ -1,5 +1,5 @@
 {
-  "titulo": "GERENCIADOR DE NOTAS - ETAPA 6 - 2025/1",
+  "titulo": "AVALIAÇÃO FORMATIVA CLINICA MEDICA ETAPA 6",
   "alunos": [
     "Ana Beatriz Freitas Fragato",
     "Ana Carolina Lemanski",
@@ -73,7 +73,7 @@
     },
     "Giovana Volpato Pazin Feuser": {
       "senha": "giovana123",
-      "acesso_relatorio": false
+      "acesso_relatorio": true
     },
     "Giovanna Laura Galvão": {
       "senha": "giovanna123",
