@@ -1,0 +1,22 @@
+{
+  "titulo": "GERENCIADOR DE NOTAS - CL\u00cdNICA CIR\u00daRGICA 2025-1",
+  "alunos": [
+    "Ana Beatriz",
+    "Carlos Henrique",
+    "Mariana Dias"
+  ],
+  "usuarios": {
+    "NASSER MAHFOUZ": {
+      "senha": "nasser123",
+      "acesso_relatorio": true
+    },
+    "LUIGI RODRIGUES BRIANEZ": {
+      "senha": "luigi123",
+      "acesso_relatorio": true
+    },
+    "JO\u00c3O GOMES": {
+      "senha": "joao123",
+      "acesso_relatorio": false
+    }
+  }
+}
