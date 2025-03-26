@@ -173,5 +173,22 @@ def editar_nota(nota_id):
 def exportar():
     return send_file("export_notas.csv", as_attachment=True)
 
+@app.route("/resetar")
+def resetar():
+    # Apenas NASSER pode usar
+    if "usuario" not in session or session["usuario"].upper() != "NASSER MAHFOUZ":
+        return redirect("/login")
+    
+    # Limpa todas as notas do banco
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM notas")
+        conn.commit()
+    
+    return """
+    <h3>✅ Todas as notas foram apagadas com sucesso!</h3>
+    <a href='/'>Voltar ao início</a>
+    """
+
 if __name__ == "__main__":
     app.run(debug=True)
