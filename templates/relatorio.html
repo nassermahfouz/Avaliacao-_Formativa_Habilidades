@@ -46,7 +46,7 @@
             <td>{{ r[2] }}</td>
             <td>{{ r[3] }}</td>
             <td>{{ r[4] }}
-            {% if session['usuario'] in ['NASSER MAHFOUZ', 'GIOVANA VOLPATO'] %}
+            {% if acesso %}
             <a href='/editar-nota/{{ r[0] }}' class='btn btn-sm btn-outline-primary ms-2'>✏️ Editar</a>
             {% endif %}
             </td>
