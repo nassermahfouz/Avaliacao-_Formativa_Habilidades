@@ -1,0 +1,18 @@
+{
+  "titulo": "GERENCIADOR DE NOTAS - ETAPA 6 - 2025/1",
+  "alunos": [
+    "Ana Beatriz",
+    "Carlos Henrique",
+    "Mariana Dias"
+  ],
+  "usuarios": {
+    "NASSER MAHFOUZ": {
+      "senha": "nasser123",
+      "acesso_relatorio": true
+    },
+    "GIOVANA VOLPATO": {
+      "senha": "giovana123",
+      "acesso_relatorio": true
+    }
+  }
+}

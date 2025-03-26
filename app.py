@@ -1,30 +1,35 @@
 
+import os
+import json
+import psycopg2
 from flask import Flask, render_template, request, redirect, session, send_file
-import sqlite3, os, csv, json
 from datetime import datetime
+import csv
 
 app = Flask(__name__)
-app.secret_key = "etapa_config"
-
-DB_FILE = "notas.db"
-CONFIG_FILE = "config.json"
+app.secret_key = "etapa_pg"
+CONFIG_FILE = "config_etapa6_2025_1.json"
 
 def carregar_config():
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
+def get_conn():
+    return psycopg2.connect(os.environ["DATABASE_URL"])
+
 def init_db():
-    if not os.path.exists(DB_FILE):
-        with sqlite3.connect(DB_FILE) as conn:
-            conn.execute('''
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute('''
                 CREATE TABLE IF NOT EXISTS notas (
-                    id INTEGER PRIMARY KEY,
+                    id SERIAL PRIMARY KEY,
                     aluno TEXT,
                     professor TEXT,
                     nota REAL,
                     datahora TEXT
                 )
             ''')
+        conn.commit()
 
 init_db()
 
@@ -82,9 +87,11 @@ def index():
         try:
             nota = float(nota)
             if 0 <= nota <= 10:
-                with sqlite3.connect(DB_FILE) as conn:
-                    conn.execute("INSERT INTO notas (aluno, professor, nota, datahora) VALUES (?, ?, ?, ?)",
-                                 (aluno, usuario, nota, datetime.now().isoformat()))
+                with get_conn() as conn:
+                    with conn.cursor() as cur:
+                        cur.execute("INSERT INTO notas (aluno, professor, nota, datahora) VALUES (%s, %s, %s, %s)",
+                                    (aluno, usuario, nota, datetime.now().isoformat()))
+                    conn.commit()
                 resultado = f"Nota registrada com sucesso: {aluno} - {nota}"
             else:
                 resultado = "A nota deve estar entre 0 e 10."
@@ -111,19 +118,21 @@ def relatorio():
         query = "SELECT id, aluno, professor, nota, datahora FROM notas WHERE 1=1"
         params = []
         if aluno:
-            query += " AND aluno = ?"
+            query += " AND aluno = %s"
             params.append(aluno)
         if professor:
-            query += " AND professor = ?"
+            query += " AND professor = %s"
             params.append(professor)
         if data_ini:
-            query += " AND datahora >= ?"
+            query += " AND datahora >= %s"
             params.append(data_ini)
         if data_fim:
-            query += " AND datahora <= ?"
+            query += " AND datahora <= %s"
             params.append(data_fim + 'T23:59:59')
-        with sqlite3.connect(DB_FILE) as conn:
-            registros = conn.execute(query, params).fetchall()
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, params)
+                registros = cur.fetchall()
             with open("export_notas.csv", "w", newline="", encoding="utf-8") as f:
                 csv.writer(f).writerows([["Aluno", "Professor", "Nota", "DataHora"]] + registros)
     return render_template("relatorio.html", titulo=cfg["titulo"], alunos=cfg["alunos"],
@@ -138,23 +147,24 @@ def editar_nota(nota_id):
     if not cfg["usuarios"][usuario]["acesso_relatorio"]:
         return redirect("/")
     erro = sucesso = None
-    with sqlite3.connect(DB_FILE) as conn:
-        cursor = conn.cursor()
-        nota_info = cursor.execute("SELECT aluno, professor, nota FROM notas WHERE id=?", (nota_id,)).fetchone()
-        if not nota_info:
-            return "Nota não encontrada."
-        aluno, professor, nota_atual = nota_info
-        if request.method == "POST":
-            try:
-                nova = float(request.form["nova_nota"])
-                if 0 <= nova <= 10:
-                    cursor.execute("UPDATE notas SET nota=? WHERE id=?", (nova, nota_id))
-                    conn.commit()
-                    sucesso = "Nota atualizada com sucesso!"
-                else:
-                    erro = "A nota deve estar entre 0 e 10."
-            except:
-                erro = "Nota inválida."
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT aluno, professor, nota FROM notas WHERE id=%s", (nota_id,))
+            nota_info = cur.fetchone()
+            if not nota_info:
+                return "Nota não encontrada."
+            aluno, professor, nota_atual = nota_info
+            if request.method == "POST":
+                try:
+                    nova = float(request.form["nova_nota"])
+                    if 0 <= nova <= 10:
+                        cur.execute("UPDATE notas SET nota=%s WHERE id=%s", (nova, nota_id))
+                        conn.commit()
+                        sucesso = "Nota atualizada com sucesso!"
+                    else:
+                        erro = "A nota deve estar entre 0 e 10."
+                except:
+                    erro = "Nota inválida."
     return render_template("editar_nota.html", aluno=aluno, professor=professor,
                            nota_atual=nota_atual, erro=erro, sucesso=sucesso)
 
