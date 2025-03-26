@@ -1,11 +1,32 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Alterar Senha</title>
+    <title>{{ titulo }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Alterar Senha</h2>
-    <p>Este é um placeholder do template: alterar_senha.html</p>
+<body class="container mt-4">
+    <h2 class="mb-4 text-center">{{ titulo }}</h2>
+    <form method="post" class="mx-auto border p-4 rounded bg-light" style="max-width: 500px;">
+        <div class="mb-3">
+            <label>Senha atual:</label>
+            <input type="password" name="senha_atual" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Nova senha:</label>
+            <input type="password" name="nova_senha" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Confirmar nova senha:</label>
+            <input type="password" name="confirmar_senha" class="form-control" required>
+        </div>
+        <button class="btn btn-primary w-100">Alterar Senha</button>
+        {% if erro %}<div class="alert alert-danger mt-3">{{ erro }}</div>{% endif %}
+        {% if sucesso %}<div class="alert alert-success mt-3">{{ sucesso }}</div>{% endif %}
+    </form>
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-secondary">← Voltar ao Painel</a>
+    </div>
 </body>
 </html>

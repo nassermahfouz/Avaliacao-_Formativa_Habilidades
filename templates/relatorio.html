@@ -1,11 +1,59 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Relatório de Notas</title>
+    <title>{{ titulo }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Relatório de Notas</h2>
-    <p>Este é um placeholder do template: relatorio.html</p>
+<body class="container mt-4">
+    <h2>{{ titulo }}</h2>
+    <h4 class="mb-4">Relatório de Notas</h4>
+    <form method="post" class="row g-3 mb-4 border p-4 rounded bg-light">
+        <div class="col-md-4">
+            <label>Aluno:</label>
+            <select name="aluno" class="form-select">
+                <option value="">Todos</option>
+                {% for a in alunos %}<option>{{ a }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Professor:</label>
+            <select name="professor" class="form-select">
+                <option value="">Todos</option>
+                {% for p in professores %}<option>{{ p }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Data Início:</label>
+            <input type="date" name="data_ini" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <label>Data Fim:</label>
+            <input type="date" name="data_fim" class="form-control">
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary">Filtrar</button>
+            <a href="/exportar" class="btn btn-success ms-2">📥 Baixar CSV</a>
+        </div>
+    </form>
+    <table class="table table-bordered">
+        <thead><tr><th>Aluno</th><th>Professor</th><th>Nota</th><th>DataHora</th></tr></thead>
+        <tbody>
+        {% for r in registros %}
+        <tr>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+            <td>{{ r[4] }}
+            {% if session['usuario'] in ['NASSER MAHFOUZ', 'GIOVANA VOLPATO'] %}
+            <a href='/editar-nota/{{ r[0] }}' class='btn btn-sm btn-outline-primary ms-2'>✏️ Editar</a>
+            {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="/" class="btn btn-secondary">← Voltar</a>
 </body>
 </html>
